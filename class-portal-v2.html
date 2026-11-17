@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Class Portal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#eef2f5;--surf:#fff;--ink:#14213d;--mut:#5b6678;--line:#d5dce4;--acc:#f2a900;--ok:#0f766e;--okbg:#d9f1ee;--bad:#b42318;--badbg:#fde4e1;--warn:#8a5a00;--warnbg:#fff1cc;--navy:#14213d}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0e1522;--surf:#172033;--ink:#e8edf5;--mut:#9aa6ba;--line:#2b3750;--ok:#5eead4;--okbg:#10353a;--bad:#ff9a8f;--badbg:#3d1c1c;--warn:#ffd36b;--warnbg:#3b2f10;--navy:#0a101b}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0e1522;--surf:#172033;--ink:#e8edf5;--mut:#9aa6ba;--line:#2b3750;--ok:#5eead4;--okbg:#10353a;--bad:#ff9a8f;--badbg:#3d1c1c;--warn:#ffd36b;--warnbg:#3b2f10;--navy:#0a101b}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 "DM Sans",system-ui,sans-serif}
+h1,h2,h3{font-family:"Bricolage Grotesque",system-ui,sans-serif;margin:0;line-height:1.15}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--navy);color:#fff;display:flex;align-items:center;gap:12px;padding:10px 14px;flex-wrap:wrap}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--navy);z-index:30}
+header h1{font-size:20px;flex:1;min-width:120px}
+#menu{border:0;background:rgba(255,255,255,.14);color:#fff;width:40px;height:40px;border-radius:10px;font-size:20px;cursor:pointer}
+.role{display:flex;background:rgba(255,255,255,.12);border-radius:999px;padding:3px}
+.role button{border:0;background:none;color:inherit;padding:6px 12px;border-radius:999px;font:500 13px inherit;cursor:pointer}
+.role button[aria-pressed=true]{background:var(--acc);color:#14213d}
+.app{display:flex;align-items:flex-start}
+aside{width:250px;flex:none;position:sticky;top:60px;height:calc(100vh - 60px);overflow:hidden;background:var(--surf);border-right:1px solid var(--line);transition:width .25s,transform .25s}
+aside .in{width:250px;padding:12px;display:flex;flex-direction:column;gap:2px}
+.collapsed aside{width:0;border:0}
+aside button{display:flex;gap:10px;align-items:center;border:0;background:none;color:var(--ink);padding:11px 12px;border-radius:10px;font:500 15px inherit;cursor:pointer;text-align:left;width:100%}
+aside button:hover{background:var(--bg)}
+aside button[aria-current=page]{background:var(--navy);color:#fff}
+aside .who{padding:8px 12px 12px;color:var(--mut);font-size:13px}
+main{flex:1;min-width:0;max-width:940px;padding:18px;margin:0 auto}
+@media(max-width:760px){aside{position:fixed;left:0;top:60px;z-index:15;transform:translateX(0);box-shadow:4px 0 18px rgba(0,0,0,.25)}
+.collapsed aside{width:250px;transform:translateX(-105%);box-shadow:none}}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.between{justify-content:space-between}
+.panel{background:var(--surf);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px}
+.sec{display:flex;justify-content:space-between;align-items:baseline;margin:2px 0 12px;gap:8px;flex-wrap:wrap}
+.sec h2{font-size:22px}.mut{color:var(--mut);font-size:13px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-bottom:12px}
+.cards .panel{margin:0;cursor:pointer;text-align:left;font:inherit;color:inherit}
+.cards .panel:hover{border-color:var(--ink)}
+.big{font:700 30px "Bricolage Grotesque",sans-serif}
+.cls{display:grid;grid-template-columns:74px 1fr;gap:12px;border-left:4px solid var(--line)}
+.cls.held{border-left-color:var(--ok)}.cls.cancelled{border-left-color:var(--bad)}.cls.moved{border-left-color:var(--acc)}
+.time{font:700 16px "Bricolage Grotesque",sans-serif}
+.tag{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700;background:var(--line);color:var(--ink)}
+.tag.held,.tag.done,.tag.resolved,.tag.ready{background:var(--okbg);color:var(--ok)}
+.tag.cancelled,.tag.open{background:var(--badbg);color:var(--bad)}
+.tag.moved,.tag.soon,.tag.pending{background:var(--warnbg);color:var(--warn)}
+.b{border:1px solid var(--line);background:var(--surf);color:var(--ink);padding:6px 12px;border-radius:8px;font:500 13px inherit;cursor:pointer}
+.b:hover{border-color:var(--ink)}.pri{background:var(--acc);border-color:var(--acc);color:#14213d;font-weight:700}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+label{display:block;font-size:13px;font-weight:700;margin-bottom:10px}
+input,select,textarea{width:100%;margin-top:4px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:400 15px inherit}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:560px){.grid2{grid-template-columns:1fr}.cls{grid-template-columns:1fr;gap:4px}}
+.stu{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);gap:8px}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex:none}
+.seg button{border:0;background:var(--surf);color:var(--mut);padding:6px 11px;font:700 13px inherit;cursor:pointer;border-right:1px solid var(--line)}
+.seg button:last-child{border:0}
+.seg button[aria-pressed=true]{background:var(--navy);color:#fff}
+.seg .P[aria-pressed=true]{background:var(--okbg);color:var(--ok)}.seg .L[aria-pressed=true]{background:var(--warnbg);color:var(--warn)}.seg .A[aria-pressed=true]{background:var(--badbg);color:var(--bad)}
+.empty{text-align:center;color:var(--mut);padding:24px}
+.price{font:700 18px "Bricolage Grotesque",sans-serif}
+.date{width:58px;text-align:center;border:1px solid var(--line);border-radius:8px;padding:4px 0;flex:none}.date b{display:block;font:700 20px "Bricolage Grotesque",sans-serif}.date span{font-size:12px;color:var(--mut)}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--navy);color:#fff;padding:9px 16px;border-radius:8px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:40}
+#toast.on{opacity:1}
+#gate{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:18px}#gate[hidden]{display:none}
+#gate .panel{width:100%;max-width:400px;padding:22px}
+.av{width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font:700 13px "Bricolage Grotesque",sans-serif}
+</style>
+</head>
+<body>
+<header>
+ <button id="menu" aria-label="Show or hide navigation" aria-expanded="true">☰</button>
+ <h1>Class Portal</h1>
+ <div class="row" id="acct"></div>
+</header>
+<div class="app" id="app">
+ <aside id="side" aria-label="Main navigation"><div class="in" id="nav"></div></aside>
+ <main id="view"></main>
+</div>
+<div id="gate" hidden><form class="panel" id="fSign"><h2 style="font-size:26px;margin-bottom:6px">Sign in</h2><p class="mut" style="margin:0 0 16px">Enter your name and role to open the class portal.</p><label>Full name<input name="name" required maxlength="40" autocomplete="name"></label><label>I am a<select name="role"><option value="stu">Student</option><option value="rep">Class rep</option><option value="lec">Lecturer</option></select></label><button class="b pri" style="width:100%;padding:10px">Sign in</button><p class="mut" style="margin:12px 0 0">This is a profile saved on this device only. It does not verify who you are.</p></form></div>
+<div id="toast" role="status"></div>
+<script>
+const KEY="cp-v2";
+const NAV=[["dash","Dashboard","🏠"],["work","My class workspace","📚"],["time","Timetable","⏰"],["board","Classroom board","📌"],["contacts","Contacts","☎️"],["cal","Academic calendar","🗓️"],["market","Marketplace","🛒"],["print","Printing & binding","🖨️"],["data","Data bundles","📶"]];
+const ROLE={stu:"Student",rep:"Class rep",lec:"Lecturer"};
+const day=n=>{const d=new Date();d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)};
+const names=["Achieng Otieno","Brian Kamau","Cynthia Wanjiru","David Mutua","Esther Njeri","Faith Chebet","George Omondi","Hellen Akinyi","Ian Kiprop","Joy Mwende","Kevin Ochieng","Lucy Wambui","Mercy Atieno","Nelson Kariuki","Olivia Naliaka"];
+const BUNDLES=[["Safaricom","1 GB, 1 hour",19],["Safaricom","1.5 GB, 3 hours",50],["Safaricom","1 GB, 24 hours",99],["Safaricom","2.5 GB, 7 days",300],["Airtel","1 GB, 1 hour",19],["Airtel","3 GB, 3 days",100],["Airtel","10 GB, 7 days",300],["Telkom","1 GB, 24 hours",50],["Telkom","5 GB, 7 days",250]];
+const RATES={bw:["Black & white printing",5,0],col:["Colour printing",20,0],sp:["Spiral binding with B&W printing",5,150],hc:["Hardcover binding (project or thesis)",5,900]};
+const seed=()=>({role:"stu",view:"dash",sub:{work:"classes",board:"notices"},sel:"c1",
+ classes:[{id:"c1",t:"08:00",e:"10:00",unit:"Data Structures",code:"CSC 201",lec:"Dr. Mwangi",venue:"LT 3",st:"scheduled",note:""},
+ {id:"c2",t:"10:30",e:"12:30",unit:"Database Systems",code:"CSC 205",lec:"Ms. Wafula",venue:"Lab 2",st:"scheduled",note:""},
+ {id:"c3",t:"14:00",e:"16:00",unit:"Probability & Statistics",code:"STA 210",lec:"Prof. Odhiambo",venue:"LT 1",st:"scheduled",note:""}],
+ att:{},notices:[{id:1,title:"CAT 1 this Thursday",body:"Bring your calculators. Venue is LT 1 at 2:00 PM.",aud:"Whole class",by:"Lecturer",at:"Today"}],
+ issues:[{id:1,cat:"Equipment",txt:"Projector in LT 3 has no HDMI input.",cls:"CSC 201",st:"open",by:"Class rep"}],
+ tasks:[{id:1,title:"Assignment 2: Linked lists",unit:"CSC 201",due:day(2),done:false},{id:2,title:"ER diagram submission",unit:"CSC 205",due:day(5),done:false}],
+ cal:[{id:1,date:day(2),title:"CAT 1: Data Structures",type:"Exam"},{id:2,date:day(6),title:"Fee payment deadline",type:"Admin"},{id:3,date:day(14),title:"Mid-semester break begins",type:"Break"},{id:4,date:day(40),title:"End-of-semester exams begin",type:"Exam"}],
+ contacts:names.map((n,i)=>({n,p:"07"+(10+i*3)+" "+(200+i*17)+" "+(100+i*29)})).concat([{n:"Dr. Mwangi (lecturer)",p:"0722 000 111"},{n:"Ms. Wafula (lecturer)",p:"0733 000 222"}]),
+ market:[{id:1,title:"Data Structures textbook",cat:"Books",price:600,by:"Brian K.",ph:"0713 200 100",sold:false},{id:2,title:"Scientific calculator fx-991",cat:"Electronics",price:1200,by:"Mercy A.",ph:"0745 300 200",sold:false}],
+ prints:[],reqs:[]});
+let S;try{S=JSON.parse(localStorage.getItem(KEY))||seed()}catch(e){S=seed()}
+S.tt=S.tt||{link:"",img:"",by:""};S.study=S.study||[];S.user=S.user||null;S.sub.time=S.sub.time||"class";
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const toast=m=>{const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove("on"),1800)};
+const copy=async x=>{try{await navigator.clipboard.writeText(x);toast("Copied")}catch(e){prompt("Copy this text:",x)}};
+const staff=()=>S.role!=="stu",rep=()=>S.role==="rep",who=()=>S.user?`${S.user.name}, ${ROLE[S.role]}`:ROLE[S.role];
+const kes=n=>"KES "+n.toLocaleString("en-KE");
+const stL={scheduled:"Not started",held:"Held",cancelled:"Cancelled",moved:"Venue changed"};
+const cur=()=>S.classes.find(c=>c.id===S.sel)||S.classes[0];
+const dleft=d=>Math.round((new Date(d)-new Date(day(0)))/864e5);
+const rel=d=>{const n=dleft(d);return n<0?`${-n} days ago`:n===0?"Today":n===1?"Tomorrow":`In ${n} days`};
+const subs=(k,list)=>`<div class="seg" style="margin-bottom:14px;display:inline-flex">${list.map(([v,l])=>`<button data-sub="${k}:${v}" aria-pressed="${S.sub[k]===v}">${l}</button>`).join("")}</div>`;
+const empty=t=>`<div class="empty">${t}</div>`;
+
+function dash(){
+ const held=S.classes.filter(c=>c.st==="held").length,open=S.issues.filter(i=>i.st==="open").length;
+ const nt=S.tasks.filter(t=>!t.done).sort((a,b)=>a.due.localeCompare(b.due))[0],ne=S.cal.filter(e=>dleft(e.date)>=0).sort((a,b)=>a.date.localeCompare(b.date))[0];
+ const nx=S.classes.find(c=>c.st==="scheduled");
+ const card=(go,lbl,big,sm)=>`<button class="panel" data-go="${go}"><div class="mut">${lbl}</div><div class="big">${big}</div><div class="mut">${sm}</div></button>`;
+ return `<div class="sec"><h2>Hello, ${esc(S.user?S.user.name.split(" ")[0]:"there")}</h2><span class="mut">${new Date().toLocaleDateString("en-KE",{weekday:"long",day:"numeric",month:"long"})}</span></div>
+ <div class="cards">${card("work","Classes today",`${held}/${S.classes.length}`,nx?`Next: ${esc(nx.code)} at ${nx.t}, ${esc(nx.venue)}`:"All classes done")}
+ ${card("work","Next deadline",nt?rel(nt.due):"None",nt?esc(nt.title):"You are all caught up")}
+ ${card("board","Open issues",open,"Reported on the classroom board")}
+ ${card("cal","Next event",ne?rel(ne.date):"None",ne?esc(ne.title):"Nothing scheduled")}
+ ${card("print","Print orders",S.prints.filter(p=>p.st==="pending").length,"Pending pickup")}
+ ${card("data","Bundle requests",S.reqs.filter(r=>r.st==="pending").length,"Waiting to be filled")}</div>
+ <div class="panel"><h3>Latest on the board</h3>${S.notices[0]?`<p><b>${esc(S.notices[0].title)}</b><br>${esc(S.notices[0].body)}</p>`:empty("No notices yet.")}</div>`;
+}
+function work(){
+ const k=S.sub.work,tabs=[["classes","Today's classes"],["tasks","Deadlines"]];if(staff())tabs.splice(1,0,["att","Attendance"]);
+ return `<div class="sec"><h2>My class workspace</h2></div>${subs("work",tabs)}`+(k==="att"&&staff()?attv():k==="tasks"?taskv():classv());
+}
+function classv(){return S.classes.map(c=>`<div class="panel cls ${c.st}"><div><div class="time">${c.t}</div><div class="mut">to ${c.e}</div></div><div>
+ <div class="row between"><h3>${esc(c.unit)} <span class="mut">${esc(c.code)}</span></h3><span class="tag ${c.st}">${stL[c.st]}</span></div>
+ <div class="mut">${esc(c.lec)}, ${esc(c.venue)}</div>${c.note?`<div style="margin-top:6px">${esc(c.note)}</div>`:""}
+ <div class="row" style="margin-top:10px">${staff()?`<button class="b pri" data-a="open-att" data-id="${c.id}">Take attendance</button><button class="b" data-a="st" data-id="${c.id}" data-v="held">Mark held</button><button class="b" data-a="st" data-id="${c.id}" data-v="cancelled">Cancel</button><button class="b" data-a="move" data-id="${c.id}">Change venue</button>`:""}
+ <button class="b" data-a="share-c" data-id="${c.id}">Copy update</button></div></div></div>`).join("")}
+function attv(){
+ const c=cur(),m=S.att[c.id]||{},n={P:0,L:0,A:0};names.forEach(x=>{if(m[x])n[m[x]]++});
+ return `<div class="panel"><label>Class<select id="sel">${S.classes.map(x=>`<option value="${x.id}" ${x.id===c.id?"selected":""}>${x.t} ${esc(x.code)}</option>`).join("")}</select></label>
+ <div class="row between"><b><span style="color:var(--ok)">Present ${n.P}</span> &nbsp; <span style="color:var(--warn)">Late ${n.L}</span> &nbsp; <span style="color:var(--bad)">Absent ${n.A}</span></b><span class="mut">${n.P+n.L+n.A} of ${names.length} marked</span></div>
+ <div class="row" style="margin-top:12px"><button class="b" data-a="allP">Mark all present</button><button class="b" data-a="clear">Clear</button><button class="b pri" data-a="share-att">Copy summary</button></div></div>
+ <div class="panel">${names.map(x=>`<div class="stu"><span>${esc(x)}</span><div class="seg">${[["P","Present"],["L","Late"],["A","Absent"]].map(([k,l])=>`<button class="${k}" data-a="mark" data-n="${esc(x)}" data-v="${k}" aria-pressed="${m[x]===k}">${l}</button>`).join("")}</div></div>`).join("")}</div>`}
+function taskv(){
+ const l=[...S.tasks].sort((a,b)=>a.done-b.done||a.due.localeCompare(b.due));
+ return (staff()?`<form class="panel" id="fTask"><div class="grid2"><label>Title<input name="title" required maxlength="80"></label><label>Unit code<input name="unit" required maxlength="12" placeholder="CSC 201"></label></div><label>Due date<input type="date" name="due" required min="${day(0)}"></label><button class="b pri">Add deadline</button></form>`:"")+
+ (l.length?l.map(t=>{const d=dleft(t.due);return `<div class="panel row between"><div><h3 style="font-size:16px;${t.done?"text-decoration:line-through;opacity:.6":""}">${esc(t.title)}</h3><span class="mut">${esc(t.unit)}, ${t.due}</span></div><div class="row"><span class="tag ${t.done?"done":d<=2?"soon":""}">${t.done?"Done":rel(t.due)}</span><button class="b" data-a="tog-t" data-id="${t.id}">${t.done?"Undo":"Mark done"}</button>${staff()?`<button class="b" data-a="del-t" data-id="${t.id}">Delete</button>`:""}</div></div>`}).join(""):empty("No deadlines yet."));
+}
+function board(){
+ const k=S.sub.board;
+ return `<div class="sec"><h2>Classroom board</h2></div>${subs("board",[["notices","Notices"],["issues","Issues"]])}`+(k==="issues"?issuev():noticev());
+}
+function noticev(){return (staff()?`<form class="panel" id="fNotice"><div class="grid2"><label>Title<input name="title" required maxlength="80"></label><label>Audience<select name="aud"><option>Whole class</option><option>Class reps only</option></select></label></div><label>Message<textarea name="body" rows="3" required></textarea></label><button class="b pri">Post notice</button></form>`:"")+
+ (S.notices.length?S.notices.filter(n=>n.aud==="Whole class"||staff()).map(n=>`<div class="panel"><div class="row between"><h3>${esc(n.title)}</h3><span class="tag">${esc(n.aud)}</span></div><p style="margin:8px 0">${esc(n.body)}</p><div class="row between"><span class="mut">${esc(n.by)}, ${esc(n.at)}</span><span class="row"><button class="b" data-a="share-n" data-id="${n.id}">Copy for group</button>${staff()?`<button class="b" data-a="del-n" data-id="${n.id}">Delete</button>`:""}</span></div></div>`).join(""):empty("No notices yet."))}
+function issuev(){return `<form class="panel" id="fIssue"><div class="grid2"><label>Category<select name="cat"><option>Equipment</option><option>Venue</option><option>Timetable clash</option><option>Learning materials</option><option>Other</option></select></label><label>Class<select name="cls">${S.classes.map(c=>`<option>${esc(c.code)}</option>`).join("")}<option>General</option></select></label></div><label>What is the problem?<textarea name="txt" rows="2" required></textarea></label><button class="b pri">Report issue</button></form>`+
+ (S.issues.length?S.issues.map(i=>`<div class="panel"><div class="row between"><h3>${esc(i.cat)} <span class="mut">${esc(i.cls)}</span></h3><span class="tag ${i.st}">${i.st==="open"?"Open":"Resolved"}</span></div><p style="margin:8px 0">${esc(i.txt)}</p><div class="row between"><span class="mut">Raised by ${esc(i.by)}</span>${S.role==="lec"?`<button class="b" data-a="tog-i" data-id="${i.id}">${i.st==="open"?"Mark resolved":"Reopen"}</button>`:""}</div></div>`).join(""):empty("No issues reported."))}
+function contacts(){
+ if(!rep())return `<div class="sec"><h2>Contacts</h2></div>${empty("Only the class rep can view contacts. Switch to Class rep to see this page.")}`;
+ return `<div class="sec"><h2>Contacts</h2><span class="mut">Visible to the class rep only</span></div><div class="panel"><label>Search<input id="q" placeholder="Type a name"></label><div id="clist">${clist("")}</div></div>`}
+const clist=q=>S.contacts.filter(c=>c.n.toLowerCase().includes(q)).map(c=>`<div class="stu"><span>${esc(c.n)}<br><span class="mut">${esc(c.p)}</span></span><button class="b" data-a="copy" data-v="${esc(c.p)}">Copy number</button></div>`).join("")||empty("No match.");
+function cal(){
+ const l=[...S.cal].sort((a,b)=>a.date.localeCompare(b.date));
+ return `<div class="sec"><h2>Academic calendar</h2></div>`+(staff()?`<form class="panel" id="fCal"><div class="grid2"><label>Event<input name="title" required maxlength="80"></label><label>Type<select name="type"><option>Exam</option><option>Admin</option><option>Break</option><option>Event</option></select></label></div><label>Date<input type="date" name="date" required></label><button class="b pri">Add event</button></form>`:"")+
+ (l.length?l.map(e=>{const d=new Date(e.date);return `<div class="panel row between"><div class="row"><div class="date"><b>${d.getDate()}</b><span>${d.toLocaleDateString("en-KE",{month:"short"})}</span></div><div><h3 style="font-size:16px">${esc(e.title)}</h3><span class="mut">${rel(e.date)}</span></div></div><div class="row"><span class="tag ${dleft(e.date)<=3&&dleft(e.date)>=0?"soon":""}">${esc(e.type)}</span>${staff()?`<button class="b" data-a="del-e" data-id="${e.id}">Delete</button>`:""}</div></div>`}).join(""):empty("No events yet."));
+}
+function market(){return `<div class="sec"><h2>Marketplace</h2><span class="mut">Buy and sell within your class</span></div><form class="panel" id="fMarket"><div class="grid2"><label>Item<input name="title" required maxlength="60"></label><label>Category<select name="cat"><option>Books</option><option>Electronics</option><option>Clothing</option><option>Services</option><option>Other</option></select></label></div><div class="grid2"><label>Price (KES)<input type="number" name="price" min="0" required></label><label>Your phone<input name="ph" required placeholder="07xx xxx xxx"></label></div><button class="b pri">List item</button></form>`+
+ (S.market.length?S.market.map(m=>`<div class="panel row between"><div><h3 style="font-size:16px;${m.sold?"text-decoration:line-through;opacity:.6":""}">${esc(m.title)}</h3><span class="mut">${esc(m.cat)}, ${esc(m.by)}</span></div><div class="row"><span class="price">${kes(+m.price)}</span>${m.sold?`<span class="tag">Sold</span>`:`<button class="b" data-a="copy" data-v="${esc(m.ph)}">Copy seller's number</button>`}<button class="b" data-a="sold" data-id="${m.id}">${m.sold?"Relist":"Mark sold"}</button></div></div>`).join(""):empty("Nothing listed yet."))}
+function print(){const o=S.prints;return `<div class="sec"><h2>Project printing & binding</h2><span class="mut">Estimated rates. The shop confirms the final price.</span></div><form class="panel" id="fPrint"><div class="grid2"><label>Document name<input name="doc" required maxlength="60" placeholder="Final year project"></label><label>Service<select name="svc">${Object.entries(RATES).map(([k,v])=>`<option value="${k}">${v[0]}</option>`).join("")}</select></label></div><div class="grid2"><label>Pages<input type="number" name="pages" min="1" value="50" required></label><label>Copies<input type="number" name="copies" min="1" value="1" required></label></div><button class="b pri">Place order</button></form>`+
+ (o.length?o.map(p=>`<div class="panel row between"><div><h3 style="font-size:16px">${esc(p.doc)}</h3><span class="mut">${esc(RATES[p.svc][0])}, ${p.pages} pages x ${p.copies}</span></div><div class="row"><span class="price">${kes(p.total)}</span><span class="tag ${p.st}">${p.st==="ready"?"Ready":"Pending"}</span>${staff()?`<button class="b" data-a="tog-p" data-id="${p.id}">${p.st==="ready"?"Undo":"Mark ready"}</button>`:""}</div></div>`).join(""):empty("No print orders yet."))}
+function data(){
+ const tot=S.reqs.filter(r=>r.st==="pending").reduce((a,r)=>a+r.price,0);
+ return `<div class="sec"><h2>Data bundles</h2><span class="mut">Sample prices. Confirm with your provider before paying.</span></div><form class="panel" id="fData"><div class="grid2"><label>Bundle<select name="b">${BUNDLES.map((b,i)=>`<option value="${i}">${b[0]}: ${b[1]} (${kes(b[2])})</option>`).join("")}</select></label><label>Phone number to top up<input name="ph" required placeholder="07xx xxx xxx"></label></div><button class="b pri">Request bundle</button></form>`+
+ (rep()?`<div class="panel row between"><span><b>${S.reqs.filter(r=>r.st==="pending").length} pending</b>, total ${kes(tot)}</span><button class="b" data-a="share-d">Copy list</button></div>`:"")+
+ (S.reqs.length?S.reqs.map(r=>`<div class="panel row between"><div><h3 style="font-size:16px">${esc(r.net)}: ${esc(r.desc)}</h3><span class="mut">${esc(r.ph)}, ${esc(r.by)}</span></div><div class="row"><span class="price">${kes(r.price)}</span><span class="tag ${r.st==="done"?"done":"pending"}">${r.st==="done"?"Filled":"Pending"}</span>${rep()?`<button class="b" data-a="tog-d" data-id="${r.id}">${r.st==="done"?"Undo":"Mark filled"}</button>`:""}</div></div>`).join(""):empty("No bundle requests yet."));
+}
+const DAYS=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+const SS=[["planned","Planned"],["doing","In progress"],["done","Done"],["missed","Missed"]];
+function tview(){return `<div class="sec"><h2>Timetable</h2></div>${subs("time",[["class","Class timetable"],["study","My study timetable"]])}`+(S.sub.time==="study"?studyv():classtt())}
+function classtt(){const t=S.tt;return (staff()?`<form class="panel" id="fTT"><label>Timetable link (Google Drive, PDF or website)<input name="link" value="${esc(t.link)}" placeholder="https://"></label><label>Or upload a photo or screenshot<input type="file" id="ttfile" accept="image/*"></label><div class="row"><button class="b pri">Save link</button>${t.img||t.link?`<button type="button" class="b" data-a="clr-tt">Remove timetable</button>`:""}</div></form>`:"")+
+(t.link?`<div class="panel row between"><span>Timetable link</span><a class="b" href="${esc(t.link)}" target="_blank" rel="noopener">Open link</a></div>`:"")+
+(t.img?`<div class="panel"><img src="${t.img}" alt="Class timetable" style="max-width:100%;border-radius:8px"><div class="mut">Uploaded by ${esc(t.by||"")}</div></div>`:"")+(!t.link&&!t.img?empty(staff()?"Add the timetable link or upload an image above.":"No timetable yet. Your class rep or lecturer will upload it."):"")}
+function studyv(){const me=S.user?S.user.name:"",l=S.study.filter(x=>x.o===me),dn=l.filter(x=>x.st==="done").length;
+return `<form class="panel" id="fStudy"><div class="grid2"><label>Subject or topic<input name="topic" required maxlength="60"></label><label>Day<select name="day">${DAYS.map(d=>`<option>${d}</option>`).join("")}</select></label></div><div class="grid2"><label>Start<input type="time" name="s" value="18:00" required></label><label>End<input type="time" name="e" value="19:30" required></label></div><button class="b pri">Add study slot</button></form>`+
+(l.length?`<div class="panel"><b>${dn} of ${l.length} sessions done</b></div>`+DAYS.filter(d=>l.some(x=>x.d===d)).map(d=>`<div class="mut" style="margin:10px 0 6px">${d}</div>`+l.filter(x=>x.d===d).sort((a,b)=>a.s.localeCompare(b.s)).map(x=>`<div class="panel row between"><div><h3 style="font-size:16px">${esc(x.topic)}</h3><span class="mut">${x.s} to ${x.e}</span></div><div class="row"><div class="seg">${SS.map(([k,v])=>`<button data-a="st-s" data-id="${x.id}" data-v="${k}" aria-pressed="${x.st===k}">${v}</button>`).join("")}</div><button class="b" data-a="del-s" data-id="${x.id}">Delete</button></div></div>`).join("")).join(""):empty("No study slots yet. Plan your first session above."))}
+const V={dash,work,time:tview,board,contacts,cal,market,print,data};
+const small=()=>matchMedia("(max-width:760px)").matches;
+function render(){
+ if(S.view==="contacts"&&!rep())S.view="dash";
+ const u=S.user,col={stu:"#0f766e",rep:"#f2a900",lec:"#7c3aed"};$("#gate").hidden=!!u;
+ $("#acct").innerHTML=u?`<span class="av" style="background:${col[u.role]};color:${u.role==="rep"?"#14213d":"#fff"}" title="${esc(u.name)}">${esc(u.name.split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase())}</span><span style="font-size:13px;opacity:.85">${ROLE[u.role]}</span><button class="b" data-a="out">Sign out</button>`:"";
+ if(S.sub.work==="att"&&!staff())S.sub.work="classes";
+ $("#nav").innerHTML=`<div class="who">Signed in as ${ROLE[S.role]}</div>`+NAV.filter(n=>n[0]!=="contacts"||rep()).map(([k,l,i])=>`<button data-go="${k}" ${S.view===k?'aria-current="page"':""}><span aria-hidden="true">${i}</span>${l}</button>`).join("");
+ $("#view").innerHTML=V[S.view]();save();
+}
+function setNav(open){$("#app").classList.toggle("collapsed",!open);$("#menu").setAttribute("aria-expanded",open)}
+setNav(!small());
+$("#menu").onclick=()=>setNav($("#app").classList.contains("collapsed"));
+document.addEventListener("click",e=>{
+ const r=e.target.closest(".role button");if(r){S.role=r.dataset.role;return render()}
+ const g=e.target.closest("[data-go]");if(g){S.view=g.dataset.go;if(small())setNav(false);window.scrollTo(0,0);return render()}
+ const sb=e.target.closest("[data-sub]");if(sb){const[k,v]=sb.dataset.sub.split(":");S.sub[k]=v;return render()}
+ const b=e.target.closest("[data-a]");if(!b)return;
+ const a=b.dataset.a,id=b.dataset.id,c=S.classes.find(x=>x.id===id)||cur(),by=x=>x.id==id;
+ if(a==="open-att"){S.sel=id;S.sub.work="att"}
+ else if(a==="st"){c.st=b.dataset.v;c.note=`${stL[c.st]} (reported by ${who()})`}
+ else if(a==="move"){const v=prompt("New venue for "+c.code+":",c.venue);if(!v)return;c.venue=v.trim();c.st="moved";c.note=`Venue changed to ${c.venue} (by ${who()})`}
+ else if(a==="share-c")return copy(`${c.unit} (${c.code}) at ${c.t}, ${c.venue}: ${stL[c.st]}.${c.note?" "+c.note:""}`);
+ else if(a==="mark"){const m=S.att[c.id]=S.att[c.id]||{};m[b.dataset.n]=m[b.dataset.n]===b.dataset.v?undefined:b.dataset.v}
+ else if(a==="allP"){S.att[c.id]={};names.forEach(n=>S.att[c.id][n]="P")}
+ else if(a==="clear")S.att[c.id]={};
+ else if(a==="share-att"){const m=S.att[c.id]||{},g=k=>names.filter(n=>m[n]===k);return copy(`Attendance: ${c.unit} (${c.code}), ${new Date().toLocaleDateString("en-KE")}\nPresent: ${g("P").length}\nLate: ${g("L").length}${g("L").length?" ("+g("L").join(", ")+")":""}\nAbsent: ${g("A").length}${g("A").length?" ("+g("A").join(", ")+")":""}`)}
+ else if(a==="share-n"){const n=S.notices.find(by);return copy(`*${n.title}*\n${n.body}\n- ${n.by}`)}
+ else if(a==="share-d")return copy("Data bundle requests:\n"+S.reqs.filter(r=>r.st==="pending").map(r=>`${r.ph} - ${r.net} ${r.desc} (${kes(r.price)})`).join("\n"));
+ else if(a==="copy")return copy(b.dataset.v);
+ else if(a==="del-n")S.notices=S.notices.filter(x=>!by(x));
+ else if(a==="tog-i"){const i=S.issues.find(by);i.st=i.st==="open"?"resolved":"open"}
+ else if(a==="tog-t"){const t=S.tasks.find(by);t.done=!t.done}
+ else if(a==="del-t")S.tasks=S.tasks.filter(x=>!by(x));
+ else if(a==="del-e")S.cal=S.cal.filter(x=>!by(x));
+ else if(a==="sold"){const m=S.market.find(by);m.sold=!m.sold}
+ else if(a==="tog-p"){const p=S.prints.find(by);p.st=p.st==="ready"?"pending":"ready"}
+ else if(a==="tog-d"){const r=S.reqs.find(by);r.st=r.st==="done"?"pending":"done"}
+ else if(a==="st-s")S.study.find(by).st=b.dataset.v;
+ else if(a==="del-s")S.study=S.study.filter(x=>!by(x));
+ else if(a==="clr-tt")S.tt={link:"",img:"",by:""};
+ else if(a==="out")S.user=null;
+ render();
+});
+document.addEventListener("change",e=>{if(e.target.id==="sel"){S.sel=e.target.value;render()}});
+document.addEventListener("input",e=>{if(e.target.id==="q")$("#clist").innerHTML=clist(e.target.value.toLowerCase())});
+document.addEventListener("submit",e=>{
+ e.preventDefault();const f=Object.fromEntries(new FormData(e.target)),id=Date.now(),i=e.target.id;
+ if(i==="fNotice")S.notices.unshift({id,title:f.title,body:f.body,aud:f.aud,by:who(),at:"Just now"});
+ if(i==="fIssue")S.issues.unshift({id,cat:f.cat,cls:f.cls,txt:f.txt,st:"open",by:who()});
+ if(i==="fTask")S.tasks.push({id,title:f.title,unit:f.unit,due:f.due,done:false});
+ if(i==="fCal")S.cal.push({id,date:f.date,title:f.title,type:f.type});
+ if(i==="fMarket")S.market.unshift({id,title:f.title,cat:f.cat,price:+f.price,by:who(),ph:f.ph,sold:false});
+ if(i==="fPrint"){const r=RATES[f.svc];S.prints.unshift({id,doc:f.doc,svc:f.svc,pages:+f.pages,copies:+f.copies,total:(r[1]*f.pages+r[2])*f.copies,st:"pending"})}
+ if(i==="fData"){const b=BUNDLES[f.b];S.reqs.unshift({id,net:b[0],desc:b[1],price:b[2],ph:f.ph,by:who(),st:"pending"})}
+ if(i==="fSign"){S.user={name:f.name.trim(),role:f.role};S.role=f.role;S.view="dash";e.target.reset()}
+ if(i==="fStudy")S.study.push({id,o:S.user.name,topic:f.topic,d:f.day,s:f.s,e:f.e,st:"planned"});
+ if(i==="fTT"){const l=f.link.trim();if(l&&!/^https?:\/\//i.test(l)){toast("Link must start with https://");return}S.tt.link=l;S.tt.by=who()}
+ toast(i==="fSign"?"Signed in":"Saved");render();
+});
+document.addEventListener("change",e=>{if(e.target.id!=="ttfile")return;const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,1400/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=im.width*k;c.height=im.height*k;c.getContext("2d").drawImage(im,0,0,c.width,c.height);S.tt.img=c.toDataURL("image/jpeg",.75);S.tt.by=who();render();toast("Timetable uploaded")};im.onerror=()=>toast("Use a JPG or PNG image");im.src=r.result};r.readAsDataURL(f)});
+render();
+</script>
+</body>
+</html>
